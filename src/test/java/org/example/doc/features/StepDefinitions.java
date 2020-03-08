@@ -73,6 +73,9 @@ public class StepDefinitions {
         });
     }
 
+    /**
+     * @deprecated
+     */
     @Then("I should get indicator values:")
     public void i_should_get_indicator_values(IndicatorValue.Catalog expectedList) {
         Map<String, List<IndicatorValue>> valuesByIndicatorId =
@@ -83,6 +86,7 @@ public class StepDefinitions {
             String pathIndicator = "indicators.find { it.id == '" + indicatorId + "' }";
             String pathIndicatorValues = pathIndicator + ".values";
 
+            // assert indicator values count
             Assert.assertThat(jsonPath.getList(pathIndicatorValues).size(), equalTo(indicatorValues.size()));
 
             Common.forEach(indicatorValues, (expected, i) -> {
@@ -95,6 +99,9 @@ public class StepDefinitions {
         });
     }
 
+    /**
+     * @deprecated
+     */
     @Then("I should get related indicators:")
     public void i_should_get_related_indicators(RelatedIndicator.Catalog expectedList) {
         Map<String, List<RelatedIndicator>> relatedListByIndicatorId =
@@ -105,6 +112,7 @@ public class StepDefinitions {
             String pathIndicator = "indicators.find { it.id == '" + indicatorId + "' }";
             String pathIndicatorRelated = pathIndicator + ".related";
 
+            // assert related indicators count
             Assert.assertThat(jsonPath.getList(pathIndicatorRelated).size(), equalTo(relatedIndicators.size()));
 
             Common.forEach(relatedIndicators, (expected, i) -> {
@@ -116,6 +124,9 @@ public class StepDefinitions {
         });
     }
 
+    /**
+     * @deprecated
+     */
     @Then("I should get related indicators values:")
     public void i_should_get_related_indicators_values(RelatedIndicatorValue.Catalog expectedList) {
         Map<String, List<RelatedIndicatorValue>> valuesByRelatedIndicatorId =
@@ -126,6 +137,7 @@ public class StepDefinitions {
             String pathRelatedIndicator = "indicators.related.flatten().find { it.id == '" + relatedIndicatorId + "' }";
             String pathRelatedIndicatorValues = pathRelatedIndicator + ".values";
 
+            // assert related indicators values count
             Assert.assertThat(jsonPath.getList(pathRelatedIndicatorValues).size(), equalTo(relatedIndicatorValues.size()));
 
             Common.forEach(relatedIndicatorValues, (expected, i) -> {

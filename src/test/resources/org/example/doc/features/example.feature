@@ -19,7 +19,7 @@ Feature: Get indicators
 
     # ==================================================================================================================
 
-    # main version
+    # first version
     # 1 table for every indicators
 
     And I should get indicator values:
@@ -31,7 +31,7 @@ Feature: Get indicators
 
     # ------------------------------------------------------------------------------------------------------------------
 
-    # alternative version
+    # new version
     # 1 table per indicator
 
     And indicator "i_1" should have values:
