@@ -1,0 +1,79 @@
+{
+  "indicators":[
+    {
+      "id":"i_1",
+      "name":"Indicator 01",
+      "description":"The description for Indicator 01",
+      "values":[
+        {
+          "time":{
+            "type":"m",
+            "value":201901
+          },
+          "place":"FR-IDF-0001",
+          "value":1.2,
+          "goal":1.55
+        },
+        {
+          "time":{
+            "type":"m",
+            "value":201812
+          },
+          "place":"FR-IDF-0001",
+          "value":1.3,
+          "goal":1.45
+        }
+      ],
+      "related":[
+        {
+          "id":"i_50",
+          "name":"Indicator 50",
+          "description":"The description for Indicator 50",
+          "values":[
+
+          ]
+        }
+      ],
+      "components":[
+
+      ]
+    },
+    {
+      "id":"i_2",
+      "name":"Indicator 02",
+      "description":"The description for Indicator 02",
+      "values":[
+        {
+          "time":{
+            "type":"m",
+            "value":201901
+          },
+          "place":"FR-IDF-0001",
+          "value":2.5,
+          "goal":3
+        }
+      ],
+      "related":[
+        {
+          "id":"i_51",
+          "name":"Indicator 51",
+          "description":"The description for Indicator 51",
+          "values":[
+            {
+              "time":{
+                "type":"m",
+                "value":201901
+              },
+              "place":"FR-IDF-0001",
+              "value":1.5,
+              "goal":2
+            }
+          ]
+        }
+      ],
+      "components":[
+
+      ]
+    }
+  ]
+}
