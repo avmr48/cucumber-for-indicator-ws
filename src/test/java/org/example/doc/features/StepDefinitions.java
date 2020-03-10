@@ -22,11 +22,33 @@ public class StepDefinitions {
 
     public static final String WS_URL = "http://my-json-server.typicode.com/avmr48/json-placeholder/db";
 
+    public static final String PATH_INDICATORS = "indicators";
+    private static final String PATH_INDICATOR_ID = "indicators[%d].id";
+    private static final String PATH_INDICATOR_NAME = "indicators[%d].name";
+    private static final String PATH_INDICATOR_DESCRIPTION = "indicators[%d].description";
+    public static final String INDICATORS_VALUES = "indicators.find{it.id == '%s'}.values";
+    private static final String INDICATOR_VALUE_TIME = "indicators.find{it.id == '%s'}.values[%d].time.value";
+    private static final String INDICATORS_VALUE_PLACE = "indicators.find{it.id == '%s'}.values[%d].place";
+    private static final String INDICATORS_VALUE_VALUE = "indicators.find{it.id == '%s'}.values[%d].value";
+    private static final String INDICATORS_VALUE_GOAL = "indicators.find{it.id == '%s'}.values[%d].goal";
+
     GetIndicatorRequest request;
     String requestRaw;
 
     Response response;
     JsonPath jsonPath;
+
+    private void assertIndicatorValue(String indicatorId, Integer valueIndex, IndicatorValue expectedValue) {
+        Assert.assertThat(jsonPath.getString(String.format(INDICATOR_VALUE_TIME, indicatorId, valueIndex)), equalTo(expectedValue.getTime()));
+        Assert.assertThat(jsonPath.getString(String.format(INDICATORS_VALUE_PLACE, indicatorId, valueIndex)), equalTo(expectedValue.getPlace()));
+        Assert.assertThat(jsonPath.getString(String.format(INDICATORS_VALUE_VALUE, indicatorId, valueIndex)), equalTo(expectedValue.getValue()));
+        Assert.assertThat(jsonPath.getString(String.format(INDICATORS_VALUE_GOAL, indicatorId, valueIndex)), equalTo(expectedValue.getGoal()));
+    }
+
+    private void assertIndicatorValuesCount(String indicatorId, List<IndicatorValue> expectedIndicatorValues) {
+        int count = jsonPath.getList(String.format(INDICATORS_VALUES, indicatorId)).size();
+        Assert.assertThat("Indicator values count is wrong", count, equalTo(expectedIndicatorValues.size()));
+    }
 
     @When("I ask for indicators:")
     public void i_ask_for_indicators(GetIndicatorRequest request) {
@@ -42,68 +64,50 @@ public class StepDefinitions {
         this.jsonPath = response.jsonPath();
     }
 
+    // =================================================================================================================
+    // Indicator
+
     @Then("I should get list of indicators:")
     public void i_should_get_indicator(Indicator.Catalog expectedList) {
-        // assert count
-        Assert.assertThat(jsonPath.getList("indicators").size(), equalTo(expectedList.getList().size()));
+        Assert.assertThat(jsonPath.getList(PATH_INDICATORS).size(), equalTo(expectedList.getList().size()));
 
-        // assert table
         Common.forEach(expectedList.getList(), (expected, i) -> {
-            String pathIndicator = "indicators[" + i + "]";
-            Assert.assertThat(jsonPath.getString(pathIndicator + ".id"), equalTo(expected.getId()));
-            Assert.assertThat(jsonPath.getString(pathIndicator + ".name"), equalTo(expected.getName()));
+            Assert.assertThat(jsonPath.getString(String.format(PATH_INDICATOR_ID, i)), equalTo(expected.getId()));
+            Assert.assertThat(jsonPath.getString(String.format(PATH_INDICATOR_NAME, i)), equalTo(expected.getName()));
             if (expected.getDescription() != null) {
-                Assert.assertThat(jsonPath.getString(pathIndicator + ".description"), equalTo(expected.getDescription()));
+                Assert.assertThat(jsonPath.getString(String.format(PATH_INDICATOR_DESCRIPTION, i)), equalTo(expected.getDescription()));
             }
         });
     }
 
+    // =================================================================================================================
+    // Indicator values
+
     @Then("indicator {string} should have values:")
     public void indicator_should_have_values(String indicatorId, IndicatorValue.Catalog expectedList) {
-        String pathIndicator = "indicators.find{it.id == '" + indicatorId + "'}";
-        String pathIndicatorValues = pathIndicator + ".values";
-
-        int count = jsonPath.getList(pathIndicatorValues).size();
-        Assert.assertThat(count, equalTo(expectedList.getList().size()));
-
+        assertIndicatorValuesCount(indicatorId, expectedList.getList());
         Common.forEach(expectedList.getList(), (expected, i) -> {
-            String pathValue = pathIndicatorValues + "[" + i + "]";
-            Assert.assertThat(jsonPath.getString(pathValue + ".time.value"), equalTo(expected.getTime()));
-            Assert.assertThat(jsonPath.getString(pathValue + ".place"), equalTo(expected.getPlace()));
-            Assert.assertThat(jsonPath.getString(pathValue + ".value"), equalTo(expected.getValue()));
-            Assert.assertThat(jsonPath.getString(pathValue + ".goal"), equalTo(expected.getGoal()));
+            assertIndicatorValue(indicatorId, i, expected);
         });
     }
 
-    /**
-     * @deprecated
-     */
     @Then("I should get indicator values:")
     public void i_should_get_indicator_values(IndicatorValue.Catalog expectedList) {
-        Map<String, List<IndicatorValue>> valuesByIndicatorId =
+        Map<String, List<IndicatorValue>> expectedValuesByIndicatorId =
                 expectedList.getList().stream()
                         .collect(Collectors.groupingBy(IndicatorValue::getId, Collectors.toList()));
 
-        valuesByIndicatorId.forEach((indicatorId, indicatorValues) -> {
-            String pathIndicator = "indicators.find { it.id == '" + indicatorId + "' }";
-            String pathIndicatorValues = pathIndicator + ".values";
-
-            // assert indicator values count
-            Assert.assertThat(jsonPath.getList(pathIndicatorValues).size(), equalTo(indicatorValues.size()));
-
-            Common.forEach(indicatorValues, (expected, i) -> {
-                String pathValue = pathIndicatorValues + "[" + i + "]";
-                Assert.assertThat(jsonPath.getString(pathValue + ".time.value"), equalTo(expected.getTime()));
-                Assert.assertThat(jsonPath.getString(pathValue + ".place"), equalTo(expected.getPlace()));
-                Assert.assertThat(jsonPath.getString(pathValue + ".value"), equalTo(expected.getValue()));
-                Assert.assertThat(jsonPath.getString(pathValue + ".goal"), equalTo(expected.getGoal()));
+        expectedValuesByIndicatorId.forEach((indicatorId, expectedIndicatorValues) -> {
+            assertIndicatorValuesCount(indicatorId, expectedIndicatorValues);
+            Common.forEach(expectedIndicatorValues, (expectedValue, i) -> {
+                assertIndicatorValue(indicatorId, i, expectedValue);
             });
         });
     }
 
-    /**
-     * @deprecated
-     */
+    // =================================================================================================================
+    // related indicators
+
     @Then("I should get related indicators:")
     public void i_should_get_related_indicators(RelatedIndicator.Catalog expectedList) {
         Map<String, List<RelatedIndicator>> relatedListByIndicatorId =
@@ -128,9 +132,9 @@ public class StepDefinitions {
         });
     }
 
-    /**
-     * @deprecated
-     */
+    // =================================================================================================================
+    // Related indicators values
+
     @Then("I should get related indicators values:")
     public void i_should_get_related_indicators_values(RelatedIndicatorValue.Catalog expectedList) {
         Map<String, List<RelatedIndicatorValue>> valuesByRelatedIndicatorId =
@@ -154,6 +158,9 @@ public class StepDefinitions {
         });
     }
 
+    // =================================================================================================================
+    // Raw
+
     @Then("I should have following response:")
     public void i_should_have_following_response(String responseRaw) throws IOException {
         String responseBody = response.body().print();
@@ -165,4 +172,6 @@ public class StepDefinitions {
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         Assert.assertThat(objectWriter.writeValueAsString(a), equalTo(objectWriter.writeValueAsString(b)));
     }
+
+    // =================================================================================================================
 }
