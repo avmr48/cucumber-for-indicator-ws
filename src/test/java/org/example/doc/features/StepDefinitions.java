@@ -38,6 +38,7 @@ public class StepDefinitions {
     private static final String PATH_RELATED_INDICATOR_NAME = "indicators.find { it.id == '%s' }.related[%d].name";
     private static final String PATH_RELATED_INDICATOR_DESCRIPTION = "indicators.find { it.id == '%s' }.related[%d].description";
 
+    public static final String PATH_RELATED_INDICATOR_VALUES = "indicators.related.flatten().find { it.id == '%s' }.values";
     private static final String PATH_RELATED_INDICATOR_VALUE_TIME = "indicators.related.flatten().find { it.id == '%s' }.values[%d].time.value";
     private static final String PATH_RELATED_INDICATOR_VALUE_PLACE = "indicators.related.flatten().find { it.id == '%s' }.values[%d].place";
     private static final String PATH_RELATED_INDICATOR_VALUE_VAL = "indicators.related.flatten().find { it.id == '%s' }.values[%d].value";
@@ -166,7 +167,7 @@ public class StepDefinitions {
     }
 
     private void assertRelatedIndicatorValuesCount(String relatedIndicatorId, List<RelatedIndicatorValue> relatedIndicatorValues) {
-        List<Object> list = jsonPath.getList(String.format("indicators.related.flatten().find { it.id == '%s' }.values", relatedIndicatorId));
+        List<Object> list = jsonPath.getList(String.format(PATH_RELATED_INDICATOR_VALUES, relatedIndicatorId));
         Assert.assertThat(list.size(), equalTo(relatedIndicatorValues.size()));
     }
 
