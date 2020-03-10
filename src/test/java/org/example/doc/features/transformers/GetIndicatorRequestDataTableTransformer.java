@@ -5,6 +5,8 @@ import io.cucumber.datatable.TableTransformer;
 import org.example.doc.features.Common;
 import org.example.doc.features.types.GetIndicatorRequest;
 
+import java.util.List;
+
 public class GetIndicatorRequestDataTableTransformer implements TableTransformer<GetIndicatorRequest> {
 
     public static final String COLUMN_INDICATOR_IDS = "ids";
@@ -17,19 +19,17 @@ public class GetIndicatorRequestDataTableTransformer implements TableTransformer
     @Override
     public GetIndicatorRequest transform(DataTable dataTable) throws Throwable {
 
-        return dataTable.asMaps()
-                .stream()
-                .skip(1)
-                .map(column -> new GetIndicatorRequest(
+        return Common.convertDataTableToEntityCatalog(
+                dataTable,
+                column -> new GetIndicatorRequest(
                         Common.getListOfStrings(column.get(COLUMN_INDICATOR_IDS)),
                         Common.getListOfStrings(column.get(COLUMN_PLACES)),
-                        Common.getString(column.get(COLUMN_TIME)),
+                        Common.getNullableString(column.get(COLUMN_TIME)),
                         Common.getBooleanFromYesOrNo(column.get(COLUMN_WITH_LABEL)),
                         Common.getBooleanFromYesOrNo(column.get(COLUMN_WITH_RELATED)),
                         Common.getBooleanFromYesOrNo(column.get(COLUMN_WITH_COMPONENTS))
-                ))
-                .findFirst()
-                .orElseThrow(RuntimeException::new);
+                ),
+                (List<GetIndicatorRequest> list) -> list.isEmpty() ? null : list.get(0)
+        );
     }
-
 }
