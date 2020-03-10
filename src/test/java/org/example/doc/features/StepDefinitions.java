@@ -20,21 +20,28 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 public class StepDefinitions {
 
-    public static final String WS_URL = "http://my-json-server.typicode.com/avmr48/json-placeholder/db";
+    private static final String WS_URL = "http://my-json-server.typicode.com/avmr48/json-placeholder/db";
 
-    public static final String PATH_INDICATORS = "indicators";
+    private static final String PATH_INDICATORS = "indicators";
     private static final String PATH_INDICATOR_ID = "indicators[%d].id";
     private static final String PATH_INDICATOR_NAME = "indicators[%d].name";
     private static final String PATH_INDICATOR_DESCRIPTION = "indicators[%d].description";
-    public static final String INDICATORS_VALUES = "indicators.find{it.id == '%s'}.values";
-    private static final String INDICATOR_VALUE_TIME = "indicators.find{it.id == '%s'}.values[%d].time.value";
-    private static final String INDICATORS_VALUE_PLACE = "indicators.find{it.id == '%s'}.values[%d].place";
-    private static final String INDICATORS_VALUE_VALUE = "indicators.find{it.id == '%s'}.values[%d].value";
-    private static final String INDICATORS_VALUE_GOAL = "indicators.find{it.id == '%s'}.values[%d].goal";
-    public static final String PATH_RELATED_INDICATORS_FOR_INDICATOR_OF_ID = "indicators.find { it.id == '%s' }.related";
+
+    private static final String PATH_INDICATORS_VALUES = "indicators.find{it.id == '%s'}.values";
+    private static final String PATH_INDICATOR_VALUE_TIME = "indicators.find{it.id == '%s'}.values[%d].time.value";
+    private static final String PATH_INDICATORS_VALUE_PLACE = "indicators.find{it.id == '%s'}.values[%d].place";
+    private static final String PATH_INDICATORS_VALUE_VALUE = "indicators.find{it.id == '%s'}.values[%d].value";
+    private static final String PATH_INDICATORS_VALUE_GOAL = "indicators.find{it.id == '%s'}.values[%d].goal";
+
+    private static final String PATH_RELATED_INDICATORS = "indicators.find { it.id == '%s' }.related";
     private static final String PATH_RELATED_INDICATOR_ID = "indicators.find { it.id == '%s' }.related[%d].id";
     private static final String PATH_RELATED_INDICATOR_NAME = "indicators.find { it.id == '%s' }.related[%d].name";
     private static final String PATH_RELATED_INDICATOR_DESCRIPTION = "indicators.find { it.id == '%s' }.related[%d].description";
+
+    private static final String PATH_RELATED_INDICATOR_VALUE_TIME = "indicators.related.flatten().find { it.id == '%s' }.values[%d].time.value";
+    private static final String PATH_RELATED_INDICATOR_VALUE_PLACE = "indicators.related.flatten().find { it.id == '%s' }.values[%d].place";
+    private static final String PATH_RELATED_INDICATOR_VALUE_VAL = "indicators.related.flatten().find { it.id == '%s' }.values[%d].value";
+    private static final String PATH_RELATED_INDICATOR_VALUE_GOAL = "indicators.related.flatten().find { it.id == '%s' }.values[%d].goal";
 
     GetIndicatorRequest request;
     String requestRaw;
@@ -99,16 +106,16 @@ public class StepDefinitions {
         });
     }
 
-    private void assertIndicatorValue(String indicatorId, Integer valueIndex, IndicatorValue expectedValue) {
-        Assert.assertThat(jsonPath.getString(String.format(INDICATOR_VALUE_TIME, indicatorId, valueIndex)), equalTo(expectedValue.getTime()));
-        Assert.assertThat(jsonPath.getString(String.format(INDICATORS_VALUE_PLACE, indicatorId, valueIndex)), equalTo(expectedValue.getPlace()));
-        Assert.assertThat(jsonPath.getString(String.format(INDICATORS_VALUE_VALUE, indicatorId, valueIndex)), equalTo(expectedValue.getValue()));
-        Assert.assertThat(jsonPath.getString(String.format(INDICATORS_VALUE_GOAL, indicatorId, valueIndex)), equalTo(expectedValue.getGoal()));
+    private void assertIndicatorValuesCount(String indicatorId, List<IndicatorValue> expectedIndicatorValues) {
+        int count = jsonPath.getList(String.format(PATH_INDICATORS_VALUES, indicatorId)).size();
+        Assert.assertThat("Indicator values count is wrong", count, equalTo(expectedIndicatorValues.size()));
     }
 
-    private void assertIndicatorValuesCount(String indicatorId, List<IndicatorValue> expectedIndicatorValues) {
-        int count = jsonPath.getList(String.format(INDICATORS_VALUES, indicatorId)).size();
-        Assert.assertThat("Indicator values count is wrong", count, equalTo(expectedIndicatorValues.size()));
+    private void assertIndicatorValue(String indicatorId, Integer valueIndex, IndicatorValue expectedValue) {
+        Assert.assertThat(jsonPath.getString(String.format(PATH_INDICATOR_VALUE_TIME, indicatorId, valueIndex)), equalTo(expectedValue.getTime()));
+        Assert.assertThat(jsonPath.getString(String.format(PATH_INDICATORS_VALUE_PLACE, indicatorId, valueIndex)), equalTo(expectedValue.getPlace()));
+        Assert.assertThat(jsonPath.getString(String.format(PATH_INDICATORS_VALUE_VALUE, indicatorId, valueIndex)), equalTo(expectedValue.getValue()));
+        Assert.assertThat(jsonPath.getString(String.format(PATH_INDICATORS_VALUE_GOAL, indicatorId, valueIndex)), equalTo(expectedValue.getGoal()));
     }
 
     // =================================================================================================================
@@ -129,7 +136,7 @@ public class StepDefinitions {
     }
 
     private void assertRelatedCount(List<RelatedIndicator> relatedIndicators, String indicatorId) {
-        int count = jsonPath.getList(String.format(PATH_RELATED_INDICATORS_FOR_INDICATOR_OF_ID, indicatorId)).size();
+        int count = jsonPath.getList(String.format(PATH_RELATED_INDICATORS, indicatorId)).size();
         Assert.assertThat("Related indicators count is wrong", count, equalTo(relatedIndicators.size()));
     }
 
@@ -151,20 +158,23 @@ public class StepDefinitions {
                         .collect(Collectors.groupingBy(RelatedIndicatorValue::getId, Collectors.toList()));
 
         valuesByRelatedIndicatorId.forEach((relatedIndicatorId, relatedIndicatorValues) -> {
-            String pathRelatedIndicator = "indicators.related.flatten().find { it.id == '" + relatedIndicatorId + "' }";
-            String pathRelatedIndicatorValues = pathRelatedIndicator + ".values";
-
-            // assert related indicators values count
-            Assert.assertThat(jsonPath.getList(pathRelatedIndicatorValues).size(), equalTo(relatedIndicatorValues.size()));
-
+            assertRelatedIndicatorValuesCount(relatedIndicatorId, relatedIndicatorValues);
             Common.forEach(relatedIndicatorValues, (expected, i) -> {
-                String pathValue = pathRelatedIndicatorValues + "[" + i + "]";
-                Assert.assertThat(jsonPath.getString(pathValue + ".time.value"), equalTo(expected.getTime()));
-                Assert.assertThat(jsonPath.getString(pathValue + ".place"), equalTo(expected.getPlace()));
-                Assert.assertThat(jsonPath.getString(pathValue + ".value"), equalTo(expected.getValue()));
-                Assert.assertThat(jsonPath.getString(pathValue + ".goal"), equalTo(expected.getGoal()));
+                assertRelatedIndicatorValue(relatedIndicatorId, i, expected);
             });
         });
+    }
+
+    private void assertRelatedIndicatorValuesCount(String relatedIndicatorId, List<RelatedIndicatorValue> relatedIndicatorValues) {
+        List<Object> list = jsonPath.getList(String.format("indicators.related.flatten().find { it.id == '%s' }.values", relatedIndicatorId));
+        Assert.assertThat(list.size(), equalTo(relatedIndicatorValues.size()));
+    }
+
+    private void assertRelatedIndicatorValue(String relatedIndicatorId, Integer i, RelatedIndicatorValue expected) {
+        Assert.assertThat(jsonPath.getString(String.format(PATH_RELATED_INDICATOR_VALUE_TIME, relatedIndicatorId, i)), equalTo(expected.getTime()));
+        Assert.assertThat(jsonPath.getString(String.format(PATH_RELATED_INDICATOR_VALUE_PLACE, relatedIndicatorId, i)), equalTo(expected.getPlace()));
+        Assert.assertThat(jsonPath.getString(String.format(PATH_RELATED_INDICATOR_VALUE_VAL, relatedIndicatorId, i)), equalTo(expected.getValue()));
+        Assert.assertThat(jsonPath.getString(String.format(PATH_RELATED_INDICATOR_VALUE_GOAL, relatedIndicatorId, i)), equalTo(expected.getGoal()));
     }
 
     // =================================================================================================================
