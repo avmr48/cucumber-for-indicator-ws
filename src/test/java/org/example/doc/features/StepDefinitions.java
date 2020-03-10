@@ -70,8 +70,8 @@ public class StepDefinitions {
             String pathValue = pathIndicatorValues + "[" + i + "]";
             Assert.assertThat(jsonPath.getString(pathValue + ".time.value"), equalTo(expected.getTime()));
             Assert.assertThat(jsonPath.getString(pathValue + ".place"), equalTo(expected.getPlace()));
-            Assert.assertThat(jsonPath.getDouble(pathValue + ".value"), equalTo(expected.getValue()));
-            Assert.assertThat(jsonPath.getDouble(pathValue + ".goal"), equalTo(expected.getGoal()));
+            Assert.assertThat(jsonPath.getString(pathValue + ".value"), equalTo(expected.getValue()));
+            Assert.assertThat(jsonPath.getString(pathValue + ".goal"), equalTo(expected.getGoal()));
         });
     }
 
@@ -95,8 +95,8 @@ public class StepDefinitions {
                 String pathValue = pathIndicatorValues + "[" + i + "]";
                 Assert.assertThat(jsonPath.getString(pathValue + ".time.value"), equalTo(expected.getTime()));
                 Assert.assertThat(jsonPath.getString(pathValue + ".place"), equalTo(expected.getPlace()));
-                Assert.assertThat(jsonPath.getDouble(pathValue + ".value"), equalTo(expected.getValue()));
-                Assert.assertThat(jsonPath.getDouble(pathValue + ".goal"), equalTo(expected.getGoal()));
+                Assert.assertThat(jsonPath.getString(pathValue + ".value"), equalTo(expected.getValue()));
+                Assert.assertThat(jsonPath.getString(pathValue + ".goal"), equalTo(expected.getGoal()));
             });
         });
     }
@@ -148,8 +148,8 @@ public class StepDefinitions {
                 String pathValue = pathRelatedIndicatorValues + "[" + i + "]";
                 Assert.assertThat(jsonPath.getString(pathValue + ".time.value"), equalTo(expected.getTime()));
                 Assert.assertThat(jsonPath.getString(pathValue + ".place"), equalTo(expected.getPlace()));
-                Assert.assertThat(jsonPath.getDouble(pathValue + ".value"), equalTo(expected.getValue()));
-                Assert.assertThat(jsonPath.getDouble(pathValue + ".goal"), equalTo(expected.getGoal()));
+                Assert.assertThat(jsonPath.getString(pathValue + ".value"), equalTo(expected.getValue()));
+                Assert.assertThat(jsonPath.getString(pathValue + ".goal"), equalTo(expected.getGoal()));
             });
         });
     }

@@ -26,7 +26,7 @@ Feature: Get indicators
       | id    | place       | time   | value | goal  |
       | ----- | -----       | -----  | ----- | ----- |
       | i_1   | FR-IDF-0001 | 201901 | 1.2   | 1.55  |
-      | i_1   | FR-IDF-0001 | 201812 | 1.3   | 1.45  |
+      | i_1   | FR-IDF-0001 | 201812 | null   | 1.45  |
       | i_2   | FR-IDF-0001 | 201901 | 2.5   | 3     |
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ Feature: Get indicators
       | id  | place       | time   | value | goal |
       | --  | -----       | ----   | ----- | ---- |
       | i_1 | FR-IDF-0001 | 201901 | 1.2   | 1.55 |
-      | i_1 | FR-IDF-0001 | 201812 | 1.3   | 1.45 |
+      | i_1 | FR-IDF-0001 | 201812 | null  | 1.45 |
 
     And indicator "i_2" should have values:
       | id  | place       | time   | value | goal |
@@ -115,7 +115,7 @@ Feature: Get indicators
                 "value":201812
               },
               "place":"FR-IDF-0001",
-              "value":1.3,
+              "value":null,
               "goal":1.45
             }
           ],

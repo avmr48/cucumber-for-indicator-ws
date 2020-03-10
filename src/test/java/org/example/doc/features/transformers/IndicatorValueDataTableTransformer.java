@@ -21,8 +21,8 @@ public class IndicatorValueDataTableTransformer implements TableTransformer<Indi
                         Common.getString(column.get(COLUMN_ID)),
                         Common.getString(column.get(COLUMN_TIME)),
                         Common.getString(column.get(COLUMN_PLACE)),
-                        Common.getNumber(column.get(COLUMN_VALUE)),
-                        Common.getNumber(column.get(COLUMN_GOAL))
+                        Common.getNullableString(column.get(COLUMN_VALUE)),
+                        Common.getNullableString(column.get(COLUMN_GOAL))
                 ),
                 IndicatorValue.Catalog::new
         );

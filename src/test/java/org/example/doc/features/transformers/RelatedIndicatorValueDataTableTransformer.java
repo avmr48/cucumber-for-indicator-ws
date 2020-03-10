@@ -21,8 +21,8 @@ public class RelatedIndicatorValueDataTableTransformer implements TableTransform
                         Common.getString(column.get(COLUMN_ID)),
                         Common.getString(column.get(COLUMN_TIME)),
                         Common.getString(column.get(COLUMN_PLACE)),
-                        Common.getNumber(column.get(COLUMN_VALUE)),
-                        Common.getNumber(column.get(COLUMN_GOAL))
+                        Common.getNullableString(column.get(COLUMN_VALUE)),
+                        Common.getNullableString(column.get(COLUMN_GOAL))
                 ),
                 RelatedIndicatorValue.Catalog::new
         );

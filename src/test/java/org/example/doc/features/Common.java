@@ -19,6 +19,10 @@ public class Common {
     }
 
     public static String getString(String str) {
+        return str.trim();
+    }
+
+    public static String getNullableString(String str) {
         return str == null || str.equals("null") ? null : str.trim();
     }
 
@@ -26,8 +30,9 @@ public class Common {
         return Arrays.stream(idList.split(",")).map(String::trim).collect(Collectors.toList());
     }
 
-    public static Double getNumber(String str) {
-        return Double.valueOf(str);
+    public static Double getNullableNumber(String str) {
+        String nullableString = getNullableString(str);
+        return nullableString == null ? null : Double.valueOf(nullableString);
     }
 
     public static <ENTITY, ENTITY_CATALOG> ENTITY_CATALOG convertDataTableToEntityCatalog(

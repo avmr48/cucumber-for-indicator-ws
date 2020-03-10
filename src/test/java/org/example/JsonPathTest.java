@@ -17,8 +17,8 @@ public class JsonPathTest {
         assertJsonPath(from.getString("indicators.related.id"), "[[i_50], [i_51]]");
         assertJsonPath(from.getString("indicators.related.flatten().find { it.id == 'i_50' }.id"), "i_50");
         assertJsonPath(from.getString("indicators.components.id"), "[[], []]");
-        assertJsonPath(from.getString("indicators.values.value"), "[[1.2, 1.3], [2.5]]");
-        assertJsonPath(from.getString("indicators.values[0].value"), "[1.2, 1.3]");
+        assertJsonPath(from.getString("indicators.values.value"), "[[1.2, null], [2.5]]");
+        assertJsonPath(from.getString("indicators.values[0].value"), "[1.2, null]");
         assertJsonPath(from.getString("indicators.values[1].value"), "[2.5]");
     }
 

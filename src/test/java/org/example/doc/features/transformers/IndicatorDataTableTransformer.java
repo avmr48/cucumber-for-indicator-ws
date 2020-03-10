@@ -18,7 +18,7 @@ public class IndicatorDataTableTransformer implements TableTransformer<Indicator
                 column -> new Indicator(
                         Common.getString(column.get(COLUMN_ID)),
                         Common.getString(column.get(COLUMN_NAME)),
-                        Common.getString(column.get(COLUMN_DESCRIPTION))
+                        Common.getNullableString(column.get(COLUMN_DESCRIPTION))
                 ),
                 Indicator.Catalog::new
         );

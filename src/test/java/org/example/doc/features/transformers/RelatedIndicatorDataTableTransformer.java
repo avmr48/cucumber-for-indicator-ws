@@ -20,7 +20,7 @@ public class RelatedIndicatorDataTableTransformer implements TableTransformer<Re
                         Common.getString(column.get(COLUMN_INDICATOR)),
                         Common.getString(column.get(COLUMN_ID)),
                         Common.getString(column.get(COLUMN_NAME)),
-                        Common.getString(column.get(COLUMN_DESCRIPTION))
+                        Common.getNullableString(column.get(COLUMN_DESCRIPTION))
                 ),
                 RelatedIndicator.Catalog::new
         );
