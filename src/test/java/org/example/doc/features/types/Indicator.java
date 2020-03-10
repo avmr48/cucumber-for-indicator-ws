@@ -6,6 +6,7 @@ import java.util.List;
 
 @Value
 public class Indicator {
+
     String id;
     String name;
     String description;

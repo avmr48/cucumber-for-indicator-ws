@@ -7,14 +7,18 @@ import org.example.doc.features.types.Indicator;
 
 public class IndicatorDataTableTransformer implements TableTransformer<Indicator.Catalog> {
 
+    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_DESCRIPTION = "description";
+
     @Override
     public Indicator.Catalog transform(DataTable dataTable) throws Throwable {
         return Common.convertDataTableToEntityCatalog(
                 dataTable,
                 column -> new Indicator(
-                        Common.getString(column.get(0)),
-                        Common.getString(column.get(1)),
-                        Common.getString(column.get(2))
+                        Common.getString(column.get(COLUMN_ID)),
+                        Common.getString(column.get(COLUMN_NAME)),
+                        Common.getString(column.get(COLUMN_DESCRIPTION))
                 ),
                 Indicator.Catalog::new
         );

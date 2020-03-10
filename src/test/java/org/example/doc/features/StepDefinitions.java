@@ -52,7 +52,9 @@ public class StepDefinitions {
             String pathIndicator = "indicators[" + i + "]";
             Assert.assertThat(jsonPath.getString(pathIndicator + ".id"), equalTo(expected.getId()));
             Assert.assertThat(jsonPath.getString(pathIndicator + ".name"), equalTo(expected.getName()));
-            Assert.assertThat(jsonPath.getString(pathIndicator + ".description"), equalTo(expected.getDescription()));
+            if (expected.getDescription() != null) {
+                Assert.assertThat(jsonPath.getString(pathIndicator + ".description"), equalTo(expected.getDescription()));
+            }
         });
     }
 
@@ -119,7 +121,9 @@ public class StepDefinitions {
                 String pathValue = pathIndicatorRelated + "[" + i + "]";
                 Assert.assertThat(jsonPath.getString(pathValue + ".id"), equalTo(expected.getId()));
                 Assert.assertThat(jsonPath.getString(pathValue + ".name"), equalTo(expected.getName()));
-                Assert.assertThat(jsonPath.getString(pathValue + ".description"), equalTo(expected.getDescription()));
+                if (expected.getDescription() != null) {
+                    Assert.assertThat(jsonPath.getString(pathValue + ".description"), equalTo(expected.getDescription()));
+                }
             });
         });
     }

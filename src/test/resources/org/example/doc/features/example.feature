@@ -7,15 +7,15 @@ Feature: Get indicators
   Scenario: Get list of indicators
 
     When I ask for indicators:
-      | ids      | place       | time            | description | with related | with components |
+      | ids      | places      | time            | with label  | with related | with components |
       | ---      | -----       | ----            | ----------- | ------------ | --------------- |
       | i_1, i_2 | FR-IDF-0001 | 201801 - 201901 | Y           | Y            | N               |
 
     Then I should get list of indicators:
-      | id  | name         | description                      |
-      | --  | ----         | -----------                      |
-      | i_1 | Indicator 01 | The description for Indicator 01 |
-      | i_2 | Indicator 02 | The description for Indicator 02 |
+      | id  | name         |
+      | --  | ----         |
+      | i_1 | Indicator 01 |
+      | i_2 | Indicator 02 |
 
     # ==================================================================================================================
 
@@ -23,11 +23,11 @@ Feature: Get indicators
     # 1 table for every indicators
 
     And I should get indicator values:
-      | id    | time   | place       | value | goal  |
-      | ----- | -----  | -----       | ----- | ----- |
-      | i_1   | 201901 | FR-IDF-0001 | 1.2   | 1.55  |
-      | i_1   | 201812 | FR-IDF-0001 | 1.3   | 1.45  |
-      | i_2   | 201901 | FR-IDF-0001 | 2.5   | 3     |
+      | id    | place       | time   | value | goal  |
+      | ----- | -----       | -----  | ----- | ----- |
+      | i_1   | FR-IDF-0001 | 201901 | 1.2   | 1.55  |
+      | i_1   | FR-IDF-0001 | 201812 | 1.3   | 1.45  |
+      | i_2   | FR-IDF-0001 | 201901 | 2.5   | 3     |
 
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -35,28 +35,28 @@ Feature: Get indicators
     # 1 table per indicator
 
     And indicator "i_1" should have values:
-      | id  | time   | place       | value | goal |
-      | --  | ----   | -----       | ----- | ---- |
-      | i_1 | 201901 | FR-IDF-0001 | 1.2   | 1.55 |
-      | i_1 | 201812 | FR-IDF-0001 | 1.3   | 1.45 |
+      | id  | place       | time   | value | goal |
+      | --  | -----       | ----   | ----- | ---- |
+      | i_1 | FR-IDF-0001 | 201901 | 1.2   | 1.55 |
+      | i_1 | FR-IDF-0001 | 201812 | 1.3   | 1.45 |
 
     And indicator "i_2" should have values:
-      | id  | time   | place       | value | goal |
-      | --  | ----   | -----       | ----- | ---- |
-      | i_2 | 201901 | FR-IDF-0001 | 2.5   | 3    |
+      | id  | place       | time   | value | goal |
+      | --  | -----       | ----   | ----- | ---- |
+      | i_2 | FR-IDF-0001 | 201901 | 2.5   | 3    |
 
     # ==================================================================================================================
 
     And I should get related indicators:
-      | indicator | id   | name         | description                      |
-      | --------- | --   | ----         | -----------                      |
-      | i_1       | i_50 | Indicator 50 | The description for Indicator 50 |
-      | i_2       | i_51 | Indicator 51 | The description for Indicator 51 |
+      | indicator | id   | name         |
+      | --------- | --   | ----         |
+      | i_1       | i_50 | Indicator 50 |
+      | i_2       | i_51 | Indicator 51 |
 
     And I should get related indicators values:
-      | id   | time   | place       | value | goal |
-      | --   | ----   | -----       | ----- | ---- |
-      | i_51 | 201901 | FR-IDF-0001 | 1.5   | 2    |
+      | id   | place       | time   | value | goal |
+      | --   | -----       | ----   | ----- | ---- |
+      | i_51 | FR-IDF-0001 | 201901 | 1.5   | 2    |
 
 
   # technical scenario

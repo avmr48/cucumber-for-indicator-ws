@@ -7,15 +7,20 @@ import org.example.doc.features.types.RelatedIndicator;
 
 public class RelatedIndicatorDataTableTransformer implements TableTransformer<RelatedIndicator.Catalog> {
 
+    public static final String COLUMN_INDICATOR = "indicator";
+    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_DESCRIPTION = "description";
+
     @Override
     public RelatedIndicator.Catalog transform(DataTable dataTable) throws Throwable {
         return Common.convertDataTableToEntityCatalog(
                 dataTable,
                 column -> new RelatedIndicator(
-                        Common.getString(column.get(0)),
-                        Common.getString(column.get(1)),
-                        Common.getString(column.get(2)),
-                        Common.getString(column.get(3))
+                        Common.getString(column.get(COLUMN_INDICATOR)),
+                        Common.getString(column.get(COLUMN_ID)),
+                        Common.getString(column.get(COLUMN_NAME)),
+                        Common.getString(column.get(COLUMN_DESCRIPTION))
                 ),
                 RelatedIndicator.Catalog::new
         );
