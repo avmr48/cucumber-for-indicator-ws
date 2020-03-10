@@ -31,6 +31,10 @@ public class StepDefinitions {
     private static final String INDICATORS_VALUE_PLACE = "indicators.find{it.id == '%s'}.values[%d].place";
     private static final String INDICATORS_VALUE_VALUE = "indicators.find{it.id == '%s'}.values[%d].value";
     private static final String INDICATORS_VALUE_GOAL = "indicators.find{it.id == '%s'}.values[%d].goal";
+    public static final String PATH_RELATED_INDICATORS_FOR_INDICATOR_OF_ID = "indicators.find { it.id == '%s' }.related";
+    private static final String PATH_RELATED_INDICATOR_ID = "indicators.find { it.id == '%s' }.related[%d].id";
+    private static final String PATH_RELATED_INDICATOR_NAME = "indicators.find { it.id == '%s' }.related[%d].name";
+    private static final String PATH_RELATED_INDICATOR_DESCRIPTION = "indicators.find { it.id == '%s' }.related[%d].description";
 
     GetIndicatorRequest request;
     String requestRaw;
@@ -38,17 +42,7 @@ public class StepDefinitions {
     Response response;
     JsonPath jsonPath;
 
-    private void assertIndicatorValue(String indicatorId, Integer valueIndex, IndicatorValue expectedValue) {
-        Assert.assertThat(jsonPath.getString(String.format(INDICATOR_VALUE_TIME, indicatorId, valueIndex)), equalTo(expectedValue.getTime()));
-        Assert.assertThat(jsonPath.getString(String.format(INDICATORS_VALUE_PLACE, indicatorId, valueIndex)), equalTo(expectedValue.getPlace()));
-        Assert.assertThat(jsonPath.getString(String.format(INDICATORS_VALUE_VALUE, indicatorId, valueIndex)), equalTo(expectedValue.getValue()));
-        Assert.assertThat(jsonPath.getString(String.format(INDICATORS_VALUE_GOAL, indicatorId, valueIndex)), equalTo(expectedValue.getGoal()));
-    }
-
-    private void assertIndicatorValuesCount(String indicatorId, List<IndicatorValue> expectedIndicatorValues) {
-        int count = jsonPath.getList(String.format(INDICATORS_VALUES, indicatorId)).size();
-        Assert.assertThat("Indicator values count is wrong", count, equalTo(expectedIndicatorValues.size()));
-    }
+    // =================================================================================================================
 
     @When("I ask for indicators:")
     public void i_ask_for_indicators(GetIndicatorRequest request) {
@@ -105,6 +99,18 @@ public class StepDefinitions {
         });
     }
 
+    private void assertIndicatorValue(String indicatorId, Integer valueIndex, IndicatorValue expectedValue) {
+        Assert.assertThat(jsonPath.getString(String.format(INDICATOR_VALUE_TIME, indicatorId, valueIndex)), equalTo(expectedValue.getTime()));
+        Assert.assertThat(jsonPath.getString(String.format(INDICATORS_VALUE_PLACE, indicatorId, valueIndex)), equalTo(expectedValue.getPlace()));
+        Assert.assertThat(jsonPath.getString(String.format(INDICATORS_VALUE_VALUE, indicatorId, valueIndex)), equalTo(expectedValue.getValue()));
+        Assert.assertThat(jsonPath.getString(String.format(INDICATORS_VALUE_GOAL, indicatorId, valueIndex)), equalTo(expectedValue.getGoal()));
+    }
+
+    private void assertIndicatorValuesCount(String indicatorId, List<IndicatorValue> expectedIndicatorValues) {
+        int count = jsonPath.getList(String.format(INDICATORS_VALUES, indicatorId)).size();
+        Assert.assertThat("Indicator values count is wrong", count, equalTo(expectedIndicatorValues.size()));
+    }
+
     // =================================================================================================================
     // related indicators
 
@@ -115,21 +121,24 @@ public class StepDefinitions {
                         .collect(Collectors.groupingBy(RelatedIndicator::getIdIndicator, Collectors.toList()));
 
         relatedListByIndicatorId.forEach((indicatorId, relatedIndicators) -> {
-            String pathIndicator = "indicators.find { it.id == '" + indicatorId + "' }";
-            String pathIndicatorRelated = pathIndicator + ".related";
-
-            // assert related indicators count
-            Assert.assertThat(jsonPath.getList(pathIndicatorRelated).size(), equalTo(relatedIndicators.size()));
-
-            Common.forEach(relatedIndicators, (expected, i) -> {
-                String pathValue = pathIndicatorRelated + "[" + i + "]";
-                Assert.assertThat(jsonPath.getString(pathValue + ".id"), equalTo(expected.getId()));
-                Assert.assertThat(jsonPath.getString(pathValue + ".name"), equalTo(expected.getName()));
-                if (expected.getDescription() != null) {
-                    Assert.assertThat(jsonPath.getString(pathValue + ".description"), equalTo(expected.getDescription()));
-                }
+            assertRelatedCount(relatedIndicators, indicatorId);
+            Common.forEach(relatedIndicators, (expectedRelatedIndicator, i) -> {
+                assertRelatedIndicator(indicatorId, i, expectedRelatedIndicator);
             });
         });
+    }
+
+    private void assertRelatedCount(List<RelatedIndicator> relatedIndicators, String indicatorId) {
+        int count = jsonPath.getList(String.format(PATH_RELATED_INDICATORS_FOR_INDICATOR_OF_ID, indicatorId)).size();
+        Assert.assertThat("Related indicators count is wrong", count, equalTo(relatedIndicators.size()));
+    }
+
+    private void assertRelatedIndicator(String indicatorId, Integer i, RelatedIndicator expected) {
+        Assert.assertThat(jsonPath.getString(String.format(PATH_RELATED_INDICATOR_ID, indicatorId, i)), equalTo(expected.getId()));
+        Assert.assertThat(jsonPath.getString(String.format(PATH_RELATED_INDICATOR_NAME, indicatorId, i)), equalTo(expected.getName()));
+        if (expected.getDescription() != null) {
+            Assert.assertThat(jsonPath.getString(String.format(PATH_RELATED_INDICATOR_DESCRIPTION, indicatorId, i)), equalTo(expected.getDescription()));
+        }
     }
 
     // =================================================================================================================
