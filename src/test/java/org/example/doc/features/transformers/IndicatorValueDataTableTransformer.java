@@ -7,7 +7,7 @@ import org.example.doc.features.types.IndicatorValue;
 
 public class IndicatorValueDataTableTransformer implements TableTransformer<IndicatorValue.Catalog> {
 
-    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_INDICATOR_ID = "indicator id";
     public static final String COLUMN_TIME = "time";
     public static final String COLUMN_PLACE = "place";
     public static final String COLUMN_VALUE = "value";
@@ -18,7 +18,7 @@ public class IndicatorValueDataTableTransformer implements TableTransformer<Indi
         return Common.convertDataTableToEntityCatalog(
                 dataTable,
                 column -> new IndicatorValue(
-                        Common.getString(column.get(COLUMN_ID)),
+                        Common.getNullableString(column.get(COLUMN_INDICATOR_ID)),
                         Common.getString(column.get(COLUMN_TIME)),
                         Common.getString(column.get(COLUMN_PLACE)),
                         Common.getNullableString(column.get(COLUMN_VALUE)),

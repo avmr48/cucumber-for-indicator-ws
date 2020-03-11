@@ -7,6 +7,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import org.example.doc.features.types.HasParentIndicator;
 import org.example.doc.features.types.*;
 import org.junit.Assert;
 
@@ -50,6 +51,14 @@ public class StepDefinitions {
     Response response;
     JsonPath jsonPath;
 
+    private <ID, E extends HasParentIndicator<ID>> Map<ID, List<E>> indexByParentIndicatorId(List<E> list) {
+        return list.stream()
+                .collect(Collectors.groupingBy(
+                        E::getIndicatorId,
+                        Collectors.toList()
+                ));
+    }
+
     // =================================================================================================================
 
     @When("I ask for indicators:")
@@ -87,23 +96,20 @@ public class StepDefinitions {
 
     @Then("indicator {string} should have values:")
     public void indicator_should_have_values(String indicatorId, IndicatorValue.Catalog expectedList) {
-        assertIndicatorValuesCount(indicatorId, expectedList.getList());
-        Common.forEach(expectedList.getList(), (expected, i) -> {
-            assertIndicatorValue(indicatorId, i, expected);
-        });
+        assertAllIndicatorValues(indicatorId, expectedList.getList());
     }
 
     @Then("I should get indicator values:")
     public void i_should_get_indicator_values(IndicatorValue.Catalog expectedList) {
-        Map<String, List<IndicatorValue>> expectedValuesByIndicatorId =
-                expectedList.getList().stream()
-                        .collect(Collectors.groupingBy(IndicatorValue::getId, Collectors.toList()));
+        Map<String, List<IndicatorValue>> expectedValuesByIndicatorId = indexByParentIndicatorId(expectedList.getList());
 
-        expectedValuesByIndicatorId.forEach((indicatorId, expectedIndicatorValues) -> {
-            assertIndicatorValuesCount(indicatorId, expectedIndicatorValues);
-            Common.forEach(expectedIndicatorValues, (expectedValue, i) -> {
-                assertIndicatorValue(indicatorId, i, expectedValue);
-            });
+        expectedValuesByIndicatorId.forEach(this::assertAllIndicatorValues);
+    }
+
+    private void assertAllIndicatorValues(String indicatorId, List<IndicatorValue> expectedIndicatorValues) {
+        assertIndicatorValuesCount(indicatorId, expectedIndicatorValues);
+        Common.forEach(expectedIndicatorValues, (expectedValue, i) -> {
+            assertIndicatorValue(indicatorId, i, expectedValue);
         });
     }
 
@@ -122,17 +128,21 @@ public class StepDefinitions {
     // =================================================================================================================
     // related indicators
 
+    @Then("indicator {string} should have related:")
+    public void indicator_should_have_related(String indicatorId, RelatedIndicator.Catalog expectedList) {
+        assertAllRelated(indicatorId, expectedList.getList());
+    }
+
     @Then("I should get related indicators:")
     public void i_should_get_related_indicators(RelatedIndicator.Catalog expectedList) {
-        Map<String, List<RelatedIndicator>> relatedListByIndicatorId =
-                expectedList.getList().stream()
-                        .collect(Collectors.groupingBy(RelatedIndicator::getIdIndicator, Collectors.toList()));
+        Map<String, List<RelatedIndicator>> relatedListByIndicatorId = indexByParentIndicatorId(expectedList.getList());
+        relatedListByIndicatorId.forEach(this::assertAllRelated);
+    }
 
-        relatedListByIndicatorId.forEach((indicatorId, relatedIndicators) -> {
-            assertRelatedCount(relatedIndicators, indicatorId);
-            Common.forEach(relatedIndicators, (expectedRelatedIndicator, i) -> {
-                assertRelatedIndicator(indicatorId, i, expectedRelatedIndicator);
-            });
+    private void assertAllRelated(String indicatorId, List<RelatedIndicator> relatedIndicators) {
+        assertRelatedCount(relatedIndicators, indicatorId);
+        Common.forEach(relatedIndicators, (expectedRelatedIndicator, i) -> {
+            assertRelatedIndicator(indicatorId, i, expectedRelatedIndicator);
         });
     }
 
@@ -152,17 +162,23 @@ public class StepDefinitions {
     // =================================================================================================================
     // Related indicators values
 
+    @Then("related indicator {string} should have values:")
+    public void related_indicator_x_should_have_values(String relatedIndicatorId, RelatedIndicatorValue.Catalog expectedList) {
+        assertAllRelatedIndicatorValues(relatedIndicatorId, expectedList.getList());
+    }
+
     @Then("I should get related indicators values:")
     public void i_should_get_related_indicators_values(RelatedIndicatorValue.Catalog expectedList) {
         Map<String, List<RelatedIndicatorValue>> valuesByRelatedIndicatorId =
-                expectedList.getList().stream()
-                        .collect(Collectors.groupingBy(RelatedIndicatorValue::getId, Collectors.toList()));
+                indexByParentIndicatorId(expectedList.getList());
 
-        valuesByRelatedIndicatorId.forEach((relatedIndicatorId, relatedIndicatorValues) -> {
-            assertRelatedIndicatorValuesCount(relatedIndicatorId, relatedIndicatorValues);
-            Common.forEach(relatedIndicatorValues, (expected, i) -> {
-                assertRelatedIndicatorValue(relatedIndicatorId, i, expected);
-            });
+        valuesByRelatedIndicatorId.forEach(this::assertAllRelatedIndicatorValues);
+    }
+
+    private void assertAllRelatedIndicatorValues(String relatedIndicatorId, List<RelatedIndicatorValue> list) {
+        assertRelatedIndicatorValuesCount(relatedIndicatorId, list);
+        Common.forEach(list, (expected, i) -> {
+            assertRelatedIndicatorValue(relatedIndicatorId, i, expected);
         });
     }
 

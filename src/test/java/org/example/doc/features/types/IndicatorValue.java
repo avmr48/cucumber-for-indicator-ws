@@ -5,8 +5,8 @@ import lombok.Value;
 import java.util.List;
 
 @Value
-public class IndicatorValue {
-    String id;
+public class IndicatorValue implements HasParentIndicator<String> {
+    String indicatorId;
     String time;
     String place;
     String value;
